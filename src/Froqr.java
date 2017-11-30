@@ -5,7 +5,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class Froqr extends Application {
-    public static int GAME_SIZE_X = 384;
+    public static int GAME_SIZE_X = 416 ;
     public static int GAME_SIZE_Y = 512;
 
     @Override

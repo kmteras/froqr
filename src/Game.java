@@ -41,7 +41,7 @@ public class Game implements EventHandler<Event> {
 
         gc = canvas.getGraphicsContext2D();
 
-        frog = new Frog();
+        frog = new Frog(0, 7);
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, this);
         canvas.addEventHandler(MouseEvent.ANY, this);
 
@@ -63,23 +63,23 @@ public class Game implements EventHandler<Event> {
         if(event.getEventType() == KeyEvent.KEY_PRESSED) {
             KeyEvent keyEvent = (KeyEvent)event;
             if(keyEvent.getCode() == KeyCode.D) {
-                frog.move(32, 0);
+                frog.moveTile(1, 0);
             }
             else if(keyEvent.getCode() == KeyCode.A) {
-                frog.move(-32,  0);
+                frog.moveTile(-1,  0);
             }
             else if(keyEvent.getCode() == KeyCode.W) {
-                frog.move(0, -32);
+                frog.moveTile(0, -1);
             }
             else if(keyEvent.getCode() == KeyCode.S) {
-                frog.move(0,  32);
+                frog.moveTile(0,  1);
             }
         }
 
     }
 
     public void generateChunks() {
-        chunks = new Chunk[2];
+        chunks = new Chunk[5];
 
         for(int i = 0; i < chunks.length; i++) {
             chunks[i] = new Chunk(new Vec2d(0, i * Tile.TILESIZE));
@@ -87,18 +87,27 @@ public class Game implements EventHandler<Event> {
     }
 
     private void update(long dt) {
-        if(startTime == 0) {
-            startTime = dt;
-        }
+        final double fps = 60;
+        final double t = 1/fps;
 
-        scoreLabel.setText("Delta time: " + (dt - startTime) / 1_000_000 + "\n" +
-        "Dt: " + (double)(dt - lastTime) / 1_000_000 + "ms");
+        if(dt-lastTime > t * 1_000_000_000) {
+            if(startTime == 0) {
+                startTime = dt;
+                lastTime = dt;
+                return;
+            }
 
-        for(Chunk chunk : chunks) {
-            chunk.move(0.1);
+            double tc = (double)(dt - lastTime) / 1_000_000;
+
+            scoreLabel.setText("Delta time: " + (dt - startTime) / 1_000_000 + "\n" +
+                    "Dt: " + (double)(dt - lastTime) / 1_000_000 + "ms");
+
+            for(Chunk chunk : chunks) {
+                chunk.move(0.01 * tc);
+            }
+            frog.offset(0.01 * tc);
+            lastTime = dt;
         }
-        frog.move(0, 0.1);
-        lastTime = dt;
     }
 
     private void draw(long dt) {
