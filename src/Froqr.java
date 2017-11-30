@@ -1,25 +1,21 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Froqr extends Application {
+    public static int GAME_SIZE_X = 384;
+    public static int GAME_SIZE_Y = 512;
 
     @Override
     public void start(Stage stage) throws Exception {
         GridPane root = new GridPane();
-        Canvas canvas = new Canvas(400, 400);
 
-        Game game = new Game(canvas);
+        Game game = new Game(root);
 
         stage.setTitle("Froqr");
-        root.getChildren().add(canvas);
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, GAME_SIZE_X, GAME_SIZE_Y);
         scene.addEventFilter(KeyEvent.ANY, game);
         stage.setScene(scene);
         stage.show();

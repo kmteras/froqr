@@ -1,8 +1,7 @@
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
-public class Frog {
-    private Rectangle image;
+public class Frog extends Drawable {
     private double xPos, yPos;
 
     public Frog() {
@@ -11,6 +10,7 @@ public class Frog {
     }
 
     public void draw(GraphicsContext gc) {
+        gc.setFill(Color.BLUE);
         gc.fillRect(xPos, yPos, 32, 32);
     }
 
