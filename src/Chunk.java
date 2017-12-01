@@ -5,18 +5,18 @@ import java.util.Random;
 public class Chunk extends Drawable {
     public static int CHUNK_TILE_AMT = 13;
 
-    private int id;
+    private int type;
     private int seed;
     private Tile[] tiles;
-
+    private Random random;
     private long offset;
 
     public Chunk(long offset, int seed) {
         this.seed = seed;
         this.offset = offset;
 
-        Random random = new Random(seed);
-        id = random.nextInt(10);
+        random = new Random(seed);
+        type = random.nextInt(4);
         generateTiles();
     }
 
@@ -37,10 +37,25 @@ public class Chunk extends Drawable {
     private void generateTiles() {
         tiles = new Tile[CHUNK_TILE_AMT];
 
-        Random random = new Random();
+        int[] selectableTiles;
+
+        if(type == ChunkType.GRASS) {
+            selectableTiles = new int[]{TileType.GRASS_DARK,
+                    TileType.GRASS_LIGHT};
+        }
+        else if(type == ChunkType.ROAD) {
+            selectableTiles = new int[]{TileType.ROAD};
+        }
+        else if(type == ChunkType.WATER) {
+            selectableTiles = new int[]{TileType.WATER};
+        }
+        else {
+            selectableTiles = new int[]{1000};
+        }
 
         for(int i = 0; i < tiles.length; i++) {
-            tiles[i] = new Tile(random.nextInt(3), i * Tile.TILESIZE, offset);
+            int tileType = selectableTiles[random.nextInt(selectableTiles.length)];
+            tiles[i] = new Tile(tileType, i * Tile.TILESIZE, offset);
         }
     }
 

@@ -4,25 +4,28 @@ import javafx.scene.paint.Color;
 public class Tile extends Drawable {
     public static int TILESIZE = 32;
 
-    private int id;
+    private int type;
     private int posX;
     private long offset;
 
-    public Tile(int id, int x, long o) {
-        this.id = id;
+    public Tile(int type, int x, long o) {
+        this.type = type;
         posX = x;
         offset = o;
     }
 
     public void draw(GraphicsContext gc) {
-        if(id == 0) {
-            gc.setFill(Color.GREEN);
+        if(type == TileType.GRASS_LIGHT) {
+            gc.setFill(Color.GREEN.brighter());
         }
-        else if(id == 1) {
+        else if(type == TileType.GRASS_DARK) {
+            gc.setFill(Color.GREEN.darker());
+        }
+        else if(type == TileType.WATER) {
+            gc.setFill(Color.BLUE.brighter());
+        }
+        else {
             gc.setFill(Color.GRAY);
-        }
-        else if(id == 2) {
-            gc.setFill(Color.BLUE);
         }
 
         gc.fillRect(posX, offset / 1_000_000_000, 32, 32);
