@@ -12,11 +12,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 public class Game implements EventHandler<Event> {
+    private static long SCROLL_SPEED = 20;
+
     private AnimationTimer animationTimer;
+    private ChunkGenerator chunkGenerator;
     private Frog frog;
     private GraphicsContext gc;
-    private Chunk[] chunks;
+    private ArrayList<Chunk> chunks;
     private Label scoreLabel;
     private long startTime;
     private long lastTime;
@@ -32,6 +37,7 @@ public class Game implements EventHandler<Event> {
         Canvas canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
 
         scoreLabel = new Label("0");
+        scoreLabel.setTextFill(Color.RED);
         startTime = 0;
 
         pane.getChildren().add(canvas);
@@ -45,7 +51,8 @@ public class Game implements EventHandler<Event> {
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, this);
         canvas.addEventHandler(MouseEvent.ANY, this);
 
-        generateChunks();
+        chunkGenerator = new ChunkGenerator(0);
+        chunks = chunkGenerator.getStartingChunks();
     }
 
     public void start() {
@@ -59,7 +66,7 @@ public class Game implements EventHandler<Event> {
 
     @Override
     public void handle(Event event) {
-        System.out.println(event.getEventType());
+        //System.out.println(event.getEventType());
         if(event.getEventType() == KeyEvent.KEY_PRESSED) {
             KeyEvent keyEvent = (KeyEvent)event;
             if(keyEvent.getCode() == KeyCode.D) {
@@ -78,14 +85,6 @@ public class Game implements EventHandler<Event> {
 
     }
 
-    public void generateChunks() {
-        chunks = new Chunk[5];
-
-        for(int i = 0; i < chunks.length; i++) {
-            chunks[i] = new Chunk(new Vec2d(0, i * Tile.TILESIZE));
-        }
-    }
-
     private void update(long dt) {
         final double fps = 60;
         final double t = 1/fps;
@@ -98,14 +97,35 @@ public class Game implements EventHandler<Event> {
             }
 
             double tc = (double)(dt - lastTime) / 1_000_000;
+            long itc = dt - lastTime;
 
-            scoreLabel.setText("Delta time: " + (dt - startTime) / 1_000_000 + "\n" +
-                    "Dt: " + (double)(dt - lastTime) / 1_000_000 + "ms");
+            scoreLabel.setText("Time from start: " + (dt - startTime) / 1_000_000 + "ms\n" +
+                    "Delta time: " + (double)(dt - lastTime) / 1_000_000 + "ms\n");
 
-            for(Chunk chunk : chunks) {
-                chunk.move(0.01 * tc);
+            int lastIndex = 0;
+            boolean generateNew = false;
+
+            for(int i = 0; i < chunks.size(); i++) {
+                Chunk chunk = chunks.get(i);
+
+                if(chunk.isOutOfScreen()) {
+                    generateNew = true;
+                    lastIndex = i;
+                }
+
+                chunk.move(SCROLL_SPEED * itc);
+
+                scoreLabel.setText(scoreLabel.getText() + chunk.getOffset() + '\n');
             }
-            frog.offset(0.01 * tc);
+
+            if(generateNew) {
+                Chunk lastChunk = chunks.get(lastIndex);
+                Chunk newChunk = chunkGenerator.getNextChunk(lastChunk.getOffset());
+                chunks.remove(lastIndex);
+                chunks.add(newChunk);
+            }
+
+            frog.offset(SCROLL_SPEED * itc);
             lastTime = dt;
         }
     }

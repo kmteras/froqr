@@ -1,4 +1,3 @@
-import com.sun.javafx.geom.Vec2d;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -6,11 +5,13 @@ public class Tile extends Drawable {
     public static int TILESIZE = 32;
 
     private int id;
-    private Vec2d position;
+    private int posX;
+    private long offset;
 
-    public Tile(int id, Vec2d pos) {
+    public Tile(int id, int x, long o) {
         this.id = id;
-        position = pos;
+        posX = x;
+        offset = o;
     }
 
     public void draw(GraphicsContext gc) {
@@ -20,11 +21,14 @@ public class Tile extends Drawable {
         else if(id == 1) {
             gc.setFill(Color.GRAY);
         }
+        else if(id == 2) {
+            gc.setFill(Color.BLUE);
+        }
 
-        gc.fillRect((int)position.x, (int)position.y, 32, 32);
+        gc.fillRect(posX, offset / 1_000_000_000, 32, 32);
     }
 
-    public void move(double a) {
-        position.y += a;
+    public void move(long a) {
+        offset += a;
     }
 }
