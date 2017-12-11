@@ -1,4 +1,3 @@
-import com.sun.javafx.geom.Vec2d;
 import javafx.animation.AnimationTimer;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -17,16 +16,27 @@ import java.util.ArrayList;
 public class Game implements EventHandler<Event> {
     private static long SCROLL_SPEED = 20;
 
+    public enum GameState {
+        RUNNING,
+        STOPPED,
+        STARTING,
+        GAMEOVER
+    }
+
     private AnimationTimer animationTimer;
     private ChunkGenerator chunkGenerator;
     private Frog frog;
     private GraphicsContext gc;
     private ArrayList<Chunk> chunks;
-    private Label scoreLabel;
+    private Label debugText;
     private long startTime;
     private long lastTime;
+    private boolean drawDebug;
+    private GameState gameState;
 
     public Game(GridPane root) {
+        gameState = GameState.STARTING;
+
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long l) {
@@ -36,12 +46,13 @@ public class Game implements EventHandler<Event> {
         Pane pane = new Pane();
         Canvas canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
 
-        scoreLabel = new Label("0");
-        scoreLabel.setTextFill(Color.RED);
+        debugText = new Label("");
+        debugText.setTextFill(Color.RED);
         startTime = 0;
+        drawDebug = false;
 
         pane.getChildren().add(canvas);
-        pane.getChildren().add(scoreLabel);
+        pane.getChildren().add(debugText);
 
         root.getChildren().add(pane);
 
@@ -56,17 +67,22 @@ public class Game implements EventHandler<Event> {
     }
 
     public void start() {
+        gameState = GameState.RUNNING;
         animationTimer.start();
     }
 
     public void gameLoopIncrement(long dt) {
-        update(dt);
-        draw(dt);
+        if(gameState == GameState.RUNNING || gameState == GameState.GAMEOVER) {
+            update(dt);
+            draw(dt);
+        }
+        else {
+            animationTimer.stop();
+        }
     }
 
     @Override
     public void handle(Event event) {
-        //System.out.println(event.getEventType());
         if(event.getEventType() == KeyEvent.KEY_PRESSED) {
             KeyEvent keyEvent = (KeyEvent)event;
             if(keyEvent.getCode() == KeyCode.D) {
@@ -81,6 +97,10 @@ public class Game implements EventHandler<Event> {
             else if(keyEvent.getCode() == KeyCode.S) {
                 frog.moveTile(0,  1);
             }
+            else if(keyEvent.getCode() == KeyCode.Q) {
+                debugText.setText("");
+                drawDebug = !drawDebug;
+            }
         }
 
     }
@@ -91,16 +111,14 @@ public class Game implements EventHandler<Event> {
 
         if(dt-lastTime > t * 1_000_000_000) {
             if(startTime == 0) {
-                startTime = dt;
-                lastTime = dt;
+                startTime = lastTime = dt;
                 return;
             }
-
-            double tc = (double)(dt - lastTime) / 1_000_000;
             long itc = dt - lastTime;
 
-            scoreLabel.setText("Time from start: " + (dt - startTime) / 1_000_000 + "ms\n" +
-                    "Delta time: " + (double)(dt - lastTime) / 1_000_000 + "ms\n");
+            if(gameState == GameState.GAMEOVER) {
+                //Start gameover state
+            }
 
             int lastIndex = 0;
             boolean generateNew = false;
@@ -114,8 +132,6 @@ public class Game implements EventHandler<Event> {
                 }
 
                 chunk.move(SCROLL_SPEED * itc);
-
-                scoreLabel.setText(scoreLabel.getText() + chunk.getOffset() + '\n');
             }
 
             if(generateNew) {
@@ -126,8 +142,49 @@ public class Game implements EventHandler<Event> {
             }
 
             frog.offset(SCROLL_SPEED * itc);
+
+            checkCollision();
             lastTime = dt;
         }
+    }
+
+    private void checkCollision() {
+        for(Chunk chunk : chunks) {
+            if(chunk.getOffset() == frog.getChunkOffset()) {
+                Tile tile = chunk.getTile(frog.getTilePosition());
+                int type = tile.getType();
+
+                if(type == TileType.WATER) {
+                    gameState = GameState.GAMEOVER;
+                }
+            }
+        }
+    }
+
+    private void drawDebug(long dt) {
+        debugText.setText("");
+
+        addDebugText("Time from start: " + (dt - startTime) / 1_000_000 + "ms");
+        addDebugText("Delta time: " + (double)(dt - lastTime) / 1_000_000 + "ms");
+
+        for(int i = 0; i < chunks.size(); i++) {
+            Chunk chunk = chunks.get(i);
+
+            addDebugText("" + chunk.getOffset() / 1_000_000_000);
+        }
+
+        addDebugText(frog.getTilePosition() + " " + frog.getChunkPosition() + " " + frog.getOffset() / 1_000_000_000 + " " + frog.getChunkOffset() / 1_000_000_000);
+
+        for(Chunk chunk : chunks) {
+            if(chunk.getOffset() == frog.getChunkOffset()) {
+                Tile tile = chunk.getTile(frog.getTilePosition());
+                addDebugText("" + tile.getType());
+            }
+        }
+    }
+
+    private void addDebugText(String text) {
+        debugText.setText(debugText.getText() + text + '\n');
     }
 
     private void draw(long dt) {
@@ -139,5 +196,9 @@ public class Game implements EventHandler<Event> {
         }
 
         frog.draw(gc);
+
+        if(drawDebug) {
+            drawDebug(dt);
+        }
     }
 }

@@ -3,8 +3,8 @@ import javafx.scene.paint.Color;
 
 public class Frog extends Drawable {
     private int tilePosition;
-    private int chunkPosition;
-    private long chunkOffset;
+    private int chunkPosition;  //Current tile the frog is on
+    private long offset;        //The global offset that does not wrap around
 
     public Frog(int chunk, int tile) {
         tilePosition = tile;
@@ -13,7 +13,7 @@ public class Frog extends Drawable {
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
-        gc.fillRect(tilePosition * Tile.TILESIZE, chunkPosition * Tile.TILESIZE + chunkOffset / 1_000_000_000, Tile.TILESIZE, Tile.TILESIZE);
+        gc.fillRect(tilePosition * Tile.TILESIZE, chunkPosition * Tile.TILESIZE + offset / 1_000_000_000, Tile.TILESIZE, Tile.TILESIZE);
     }
 
     public void moveTile(int x, int y) {
@@ -24,6 +24,22 @@ public class Frog extends Drawable {
     }
 
     public void offset(long o) {
-        chunkOffset += o;
+        offset += o;
+    }
+
+    public int getTilePosition() {
+        return tilePosition;
+    }
+
+    public int getChunkPosition() {
+        return chunkPosition;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public long getChunkOffset() {
+        return offset + (long)chunkPosition * 32 * 1_000_000_000;
     }
 }

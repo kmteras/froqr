@@ -16,7 +16,7 @@ public class ChunkGenerator {
         ArrayList<Chunk> chunks = new ArrayList<>();
 
         for(int i = 0; i < 16; i++) {
-            chunks.add(new Chunk((long)(i * Tile.TILESIZE) * 1_000_000_000, random.nextInt()));
+            chunks.add(0, new Chunk((long)(i * Tile.TILESIZE) * 1_000_000_000, random.nextInt()));
         }
         return chunks;
     }

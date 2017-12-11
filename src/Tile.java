@@ -34,4 +34,8 @@ public class Tile extends Drawable {
     public void move(long a) {
         offset += a;
     }
+
+    public int getType() {
+        return type;
+    }
 }

@@ -6,13 +6,11 @@ public class Chunk extends Drawable {
     public static int CHUNK_TILE_AMT = 13;
 
     private int type;
-    private int seed;
     private Tile[] tiles;
     private Random random;
     private long offset;
 
     public Chunk(long offset, int seed) {
-        this.seed = seed;
         this.offset = offset;
 
         random = new Random(seed);
@@ -65,5 +63,9 @@ public class Chunk extends Drawable {
 
     public long getOffset() {
         return offset;
+    }
+
+    public Tile getTile(int a) {
+        return tiles[a];
     }
 }
