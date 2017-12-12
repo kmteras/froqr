@@ -47,10 +47,10 @@ public class Chunk extends Drawable {
 
     private void generateMovables() {
         if(type == ChunkType.ROAD) {
-            movableObjects.add(new MovableObject(offset, 2, random.nextInt(2)));
+            movableObjects.add(new MovableObject(offset, random.nextInt(3) + 1, random.nextInt(2)));
         }
         if(type == ChunkType.WATERLOG) {
-            movableObjects.add(new MovableObject(offset, 2, MovableObjectType.LOG));
+            movableObjects.add(new MovableObject(offset, random.nextInt(1) + 1, MovableObjectType.LOG));
         }
     }
 
@@ -67,7 +67,7 @@ public class Chunk extends Drawable {
             selectableTiles = new int[]{TileType.ROAD};
         }
         else if(type == ChunkType.WATER) {
-            selectableTiles = new int[]{TileType.WATER};
+            selectableTiles = new int[]{TileType.WATER, TileType.WATER_LEAF};
         }
         else if(type == ChunkType.WATERLOG) {
             selectableTiles = new int[]{TileType.WATER};
@@ -92,5 +92,9 @@ public class Chunk extends Drawable {
 
     public Tile getTile(int a) {
         return tiles[a];
+    }
+
+    public int getType() {
+        return type;
     }
 }

@@ -58,7 +58,7 @@ public class Game implements EventHandler<Event> {
 
         gc = canvas.getGraphicsContext2D();
 
-        frog = new Frog(0, 7);
+        frog = new Frog(13, 6);
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, this);
         canvas.addEventHandler(MouseEvent.ANY, this);
 

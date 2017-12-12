@@ -24,6 +24,9 @@ public class Tile extends Drawable {
         else if(type == TileType.WATER) {
             gc.setFill(Color.BLUE.brighter());
         }
+        else if(type == TileType.WATER_LEAF) {
+            gc.setFill(Color.GREEN);
+        }
         else {
             gc.setFill(Color.GRAY);
         }
