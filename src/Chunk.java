@@ -1,5 +1,5 @@
 import javafx.scene.canvas.GraphicsContext;
-
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Chunk extends Drawable {
@@ -9,18 +9,27 @@ public class Chunk extends Drawable {
     private Tile[] tiles;
     private Random random;
     private long offset;
+    private ArrayList<MovableObject> movableObjects;
 
     public Chunk(long offset, int seed) {
         this.offset = offset;
 
         random = new Random(seed);
         type = random.nextInt(4);
+
+        movableObjects = new ArrayList<>();
+
         generateTiles();
+        generateMovables();
     }
 
     public void draw(GraphicsContext gc) {
         for(int i = 0; i < tiles.length; i++) {
             tiles[i].draw(gc);
+        }
+
+        for(MovableObject movableObject : movableObjects) {
+            movableObject.draw(gc);
         }
     }
 
@@ -29,6 +38,16 @@ public class Chunk extends Drawable {
 
         for(Tile tile : tiles) {
             tile.move(o);
+        }
+
+        for(MovableObject movable : movableObjects) {
+            movable.move(o);
+        }
+    }
+
+    private void generateMovables() {
+        if(type == ChunkType.ROAD) {
+            movableObjects.add(new MovableObject(offset, 2));
         }
     }
 
