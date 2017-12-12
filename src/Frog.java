@@ -59,6 +59,8 @@ public class Frog extends Drawable {
     }
 
     public void setConnectedObject(MovableObject connectedObject) {
+        if(this.connectedObject != null)         //If the player is already connected to a object (jumping from one to another)
+            this.connectedObject.resetPlayer();
         this.connectedObject = connectedObject;
     }
 }

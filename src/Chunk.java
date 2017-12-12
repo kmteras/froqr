@@ -47,7 +47,7 @@ public class Chunk extends Drawable {
 
     private void generateMovables() {
         if(type == ChunkType.ROAD) {
-            movableObjects.add(new MovableObject(offset, random.nextInt(3) + 1, random.nextInt(2)));
+            movableObjects.add(new MovableObject(offset, random.nextInt(3) + 2, random.nextInt(2)));
         }
         if(type == ChunkType.WATER_LOG) {
             movableObjects.add(new MovableObject(offset, random.nextInt(1) + 1, MovableObjectType.LOG));

@@ -166,11 +166,11 @@ public class Game implements EventHandler<Event> {
                             frog.getXPosition() < movableObject.getRightX()) {
                         int movableObjectType = movableObject.getType();
                         if(movableObjectType == MovableObjectType.CAR ||
-                                movableObjectType == MovableObjectType.LOG) {
+                                movableObjectType == MovableObjectType.BUS) {
                             //Collision with moving object - endgame
                             System.out.println("Collision");
                         }
-                        else if(movableObjectType == MovableObjectType.BUS) {
+                        else if(movableObjectType == MovableObjectType.LOG) {
                             collidedWithMovableObject = true;
                             movableObject.setPlayer(frog);
                             System.out.println("Collision");

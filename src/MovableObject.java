@@ -48,7 +48,7 @@ public class MovableObject extends Drawable {
         if(type == MovableObjectType.CAR) {
             return x + 2L * (long)Tile.TILE_SIZE * 1_000_000_000L;
         }
-        else if(type == MovableObjectType.BUS || type == MovableObjectType.BUS) {
+        else if(type == MovableObjectType.BUS || type == MovableObjectType.LOG) {
             return x + 3L * (long)Tile.TILE_SIZE * 1_000_000_000L;
         }
         return x;
@@ -63,6 +63,10 @@ public class MovableObject extends Drawable {
         }
 
         this.player = player;
+    }
+
+    public void resetPlayer() {
+        player = null;
     }
 
     public int getType() {
