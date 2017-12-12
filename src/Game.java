@@ -171,20 +171,19 @@ public class Game implements EventHandler<Event> {
                             System.out.println("Collision");
                         }
                         else if(movableObjectType == MovableObjectType.BUS) {
+                            collidedWithMovableObject = true;
                             movableObject.setPlayer(frog);
                             System.out.println("Collision");
                         }
                         System.out.println(movableObjectType);
-
-                        collidedWithMovableObject = true;
                     }
                 }
             }
         }
 
-//        if(!collidedWithMovableObject && frog.getConnectedObject() != null) {
-//            frog.getConnectedObject().setPlayer(null);
-//        }
+        if(!collidedWithMovableObject && frog.getConnectedObject() != null) {
+            frog.getConnectedObject().setPlayer(null);
+        }
     }
 
     private void drawDebug(long dt) {

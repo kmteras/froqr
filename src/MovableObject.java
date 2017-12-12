@@ -55,8 +55,14 @@ public class MovableObject extends Drawable {
     }
 
     public void setPlayer(Frog player) {
+        if(player == null) {
+            this.player.setConnectedObject(null);
+        }
+        else {
+            player.setConnectedObject(this);
+        }
+
         this.player = player;
-        player.setConnectedObject(this);
     }
 
     public int getType() {
