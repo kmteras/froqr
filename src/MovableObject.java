@@ -7,11 +7,14 @@ public class MovableObject extends Drawable {
     private long offset;
     private int type;
 
+    private Frog player;
+
     public MovableObject(long offset, long speed, int type) {
         x = 0;
         this.speed = speed;
         this.offset = offset;
         this.type = type;
+        player = null;
     }
 
     public void draw(GraphicsContext gc) {
@@ -32,5 +35,31 @@ public class MovableObject extends Drawable {
     public void move(long o) {
         offset += o;
         this.x += o * speed;
+        if(player != null) {
+            player.offsetX(o * speed);
+        }
+    }
+
+    public long getLeftX() {
+        return x;
+    }
+
+    public long getRightX() {
+        if(type == MovableObjectType.CAR) {
+            return x + 2L * (long)Tile.TILE_SIZE * 1_000_000_000L;
+        }
+        else if(type == MovableObjectType.BUS || type == MovableObjectType.BUS) {
+            return x + 3L * (long)Tile.TILE_SIZE * 1_000_000_000L;
+        }
+        return x;
+    }
+
+    public void setPlayer(Frog player) {
+        this.player = player;
+        player.setConnectedObject(this);
+    }
+
+    public int getType() {
+        return type;
     }
 }

@@ -141,7 +141,7 @@ public class Game implements EventHandler<Event> {
                 chunks.add(newChunk);
             }
 
-            frog.offset(SCROLL_SPEED * itc);
+            frog.offsetY(SCROLL_SPEED * itc);
 
             checkCollision();
             lastTime = dt;
@@ -149,6 +149,8 @@ public class Game implements EventHandler<Event> {
     }
 
     private void checkCollision() {
+        boolean collidedWithMovableObject = false;
+
         for(Chunk chunk : chunks) {
             if(chunk.getOffset() == frog.getChunkOffset()) {
                 Tile tile = chunk.getTile(frog.getTilePosition());
@@ -157,8 +159,32 @@ public class Game implements EventHandler<Event> {
                 if(type == TileType.WATER) {
                     gameState = GameState.GAME_OVER;
                 }
+
+                for(MovableObject movableObject : chunk.getMovableObjects()) {
+                    //System.out.println(movableObject.getLeftX() + " " + movableObject.getRightX() + " " + frog.getXPosition());
+                    if(frog.getXPosition() > movableObject.getLeftX() &&
+                            frog.getXPosition() < movableObject.getRightX()) {
+                        int movableObjectType = movableObject.getType();
+                        if(movableObjectType == MovableObjectType.CAR ||
+                                movableObjectType == MovableObjectType.LOG) {
+                            //Collision with moving object - endgame
+                            System.out.println("Collision");
+                        }
+                        else if(movableObjectType == MovableObjectType.BUS) {
+                            movableObject.setPlayer(frog);
+                            System.out.println("Collision");
+                        }
+                        System.out.println(movableObjectType);
+
+                        collidedWithMovableObject = true;
+                    }
+                }
             }
         }
+
+//        if(!collidedWithMovableObject && frog.getConnectedObject() != null) {
+//            frog.getConnectedObject().setPlayer(null);
+//        }
     }
 
     private void drawDebug(long dt) {
@@ -170,10 +196,10 @@ public class Game implements EventHandler<Event> {
         for(int i = 0; i < chunks.size(); i++) {
             Chunk chunk = chunks.get(i);
 
-            addDebugText("" + chunk.getOffset() / 1_000_000_000);
+            addDebugText(i + ": " + chunk.getOffset() / 1_000_000_000);
         }
 
-        addDebugText(frog.getTilePosition() + " " + frog.getChunkPosition() + " " + frog.getOffset() / 1_000_000_000 + " " + frog.getChunkOffset() / 1_000_000_000);
+        addDebugText(frog.getTilePosition() + " " + frog.getChunkPosition() + " " + frog.getOffsetY() / 1_000_000_000 + " " + frog.getChunkOffset() / 1_000_000_000);
 
         for(Chunk chunk : chunks) {
             if(chunk.getOffset() == frog.getChunkOffset()) {

@@ -97,4 +97,8 @@ public class Chunk extends Drawable {
     public int getType() {
         return type;
     }
+
+    public ArrayList<MovableObject> getMovableObjects() {
+        return movableObjects;
+    }
 }
