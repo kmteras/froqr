@@ -5,16 +5,28 @@ public class MovableObject extends Drawable {
     private long x;
     private long speed;
     private long offset;
+    private int type;
 
-    public MovableObject(long offset, long speed) {
+    public MovableObject(long offset, long speed, int type) {
         x = 0;
         this.speed = speed;
         this.offset = offset;
+        this.type = type;
     }
 
     public void draw(GraphicsContext gc) {
-        gc.setFill(Color.RED);
-        gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE, Tile.TILESIZE);
+        if(type == MovableObjectType.CAR) {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 2, Tile.TILESIZE);
+        }
+        else if(type == MovableObjectType.BUS) {
+            gc.setFill(Color.RED);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 3, Tile.TILESIZE);
+        }
+        else if(type == MovableObjectType.LOG) {
+            gc.setFill(Color.BROWN);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 3, Tile.TILESIZE);
+        }
     }
 
     public void move(long o) {
