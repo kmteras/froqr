@@ -17,15 +17,15 @@ public class MovableObject extends Drawable {
     public void draw(GraphicsContext gc) {
         if(type == MovableObjectType.CAR) {
             gc.setFill(Color.BLACK);
-            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 2, Tile.TILESIZE);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILE_SIZE * 2, Tile.TILE_SIZE);
         }
         else if(type == MovableObjectType.BUS) {
             gc.setFill(Color.RED);
-            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 3, Tile.TILESIZE);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILE_SIZE * 3, Tile.TILE_SIZE);
         }
         else if(type == MovableObjectType.LOG) {
             gc.setFill(Color.BROWN);
-            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILESIZE * 3, Tile.TILESIZE);
+            gc.fillRect(x / 1_000_000_000L, offset / 1_000_000_000, Tile.TILE_SIZE * 3, Tile.TILE_SIZE);
         }
     }
 

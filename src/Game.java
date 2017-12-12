@@ -20,7 +20,7 @@ public class Game implements EventHandler<Event> {
         RUNNING,
         STOPPED,
         STARTING,
-        GAMEOVER
+        GAME_OVER
     }
 
     private AnimationTimer animationTimer;
@@ -72,7 +72,7 @@ public class Game implements EventHandler<Event> {
     }
 
     public void gameLoopIncrement(long dt) {
-        if(gameState == GameState.RUNNING || gameState == GameState.GAMEOVER) {
+        if(gameState == GameState.RUNNING || gameState == GameState.GAME_OVER) {
             update(dt);
             draw(dt);
         }
@@ -116,7 +116,7 @@ public class Game implements EventHandler<Event> {
             }
             long itc = dt - lastTime;
 
-            if(gameState == GameState.GAMEOVER) {
+            if(gameState == GameState.GAME_OVER) {
                 //Start gameover state
             }
 
@@ -155,7 +155,7 @@ public class Game implements EventHandler<Event> {
                 int type = tile.getType();
 
                 if(type == TileType.WATER) {
-                    gameState = GameState.GAMEOVER;
+                    gameState = GameState.GAME_OVER;
                 }
             }
         }

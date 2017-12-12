@@ -13,7 +13,7 @@ public class Frog extends Drawable {
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
-        gc.fillRect(tilePosition * Tile.TILESIZE, chunkPosition * Tile.TILESIZE + offset / 1_000_000_000, Tile.TILESIZE, Tile.TILESIZE);
+        gc.fillRect(tilePosition * Tile.TILE_SIZE, chunkPosition * Tile.TILE_SIZE + offset / 1_000_000_000, Tile.TILE_SIZE, Tile.TILE_SIZE);
     }
 
     public void moveTile(int x, int y) {

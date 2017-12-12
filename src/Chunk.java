@@ -49,7 +49,7 @@ public class Chunk extends Drawable {
         if(type == ChunkType.ROAD) {
             movableObjects.add(new MovableObject(offset, random.nextInt(3) + 1, random.nextInt(2)));
         }
-        if(type == ChunkType.WATERLOG) {
+        if(type == ChunkType.WATER_LOG) {
             movableObjects.add(new MovableObject(offset, random.nextInt(1) + 1, MovableObjectType.LOG));
         }
     }
@@ -69,7 +69,7 @@ public class Chunk extends Drawable {
         else if(type == ChunkType.WATER) {
             selectableTiles = new int[]{TileType.WATER, TileType.WATER_LEAF};
         }
-        else if(type == ChunkType.WATERLOG) {
+        else if(type == ChunkType.WATER_LOG) {
             selectableTiles = new int[]{TileType.WATER};
         }
         else {
@@ -78,7 +78,7 @@ public class Chunk extends Drawable {
 
         for(int i = 0; i < tiles.length; i++) {
             int tileType = selectableTiles[random.nextInt(selectableTiles.length)];
-            tiles[i] = new Tile(tileType, i * Tile.TILESIZE, offset);
+            tiles[i] = new Tile(tileType, i * Tile.TILE_SIZE, offset);
         }
     }
 

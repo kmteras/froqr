@@ -2,7 +2,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Tile extends Drawable {
-    public static int TILESIZE = 32;
+    public static int TILE_SIZE = 32;
 
     private int type;
     private int posX;
