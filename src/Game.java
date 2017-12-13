@@ -3,6 +3,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -20,10 +21,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -94,6 +92,8 @@ public class Game implements EventHandler<Event> {
         }
         else if (gameState == GameState.GAME_OVER) {
 
+            animationTimer.stop();
+
             Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
             cover.setFill(Paint.valueOf("#FFFFFF"));
 
@@ -106,13 +106,17 @@ public class Game implements EventHandler<Event> {
 
             Text gameover = new Text("Mäng läbi!");
             gameover.setFont(new Font(26));
+            //TODO: Teras, get score here pls
+            Text score = new Text(String.valueOf(0) + " punkti");
+            score.setFont(new Font(18));
+            score.setFill(Color.RED);
             TextField textField = new TextField("Nimi");
 
             Button button = new Button("Salvesta skoor");
-            button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> saveAndDisplayHighScores(textField.getText(), vbox));
+            button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> saveAndDisplayHighScores(textField.getText()));
 
             pane.getChildren().add(cover);
-            vbox.getChildren().addAll(gameover, textField, button);
+            vbox.getChildren().addAll(gameover, score, textField, button);
             pane.getChildren().add(vbox);
             animationTimer.stop();
         }
@@ -271,7 +275,8 @@ public class Game implements EventHandler<Event> {
         }
     }
 
-    private void saveAndDisplayHighScores(String name, VBox target) {
+    private void saveAndDisplayHighScores(String name) {
+
         HashMap<String, Integer> scores = new HashMap<>();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.txt")));
@@ -280,6 +285,8 @@ public class Game implements EventHandler<Event> {
                 String[] row = reader.readLine().trim().split(",");
                 scores.put(row[0], Integer.parseInt(row[1]));
             }
+            reader.close();
+            //TODO: Teras, somehow get score here
             scores.put(name, 0);
         }
         catch (Exception e) {
@@ -287,8 +294,52 @@ public class Game implements EventHandler<Event> {
             //TODO: dont do this
         }
 
-        //TODO: somehow get score
-        //TODO: sort and find top 5 scores
-        //TODO: display top scores
+        String highscores = "";
+        HashMap<String, Integer> loopscores = (HashMap<String, Integer>) scores.clone();
+
+
+        for (int i = 0; i < 5; i++) {
+            int maxscore = -1;
+            String best = "Free place";
+
+            for (String key : ((HashMap<String, Integer>) loopscores.clone()).keySet()) {
+                //changing the map that is being iterated automatically gives ConcurrentModificationException
+                if (loopscores.get(key) > maxscore) {
+                    maxscore = loopscores.remove(key);
+                    best = key;
+                }
+            }
+            highscores += best + ": " + String.valueOf(maxscore);
+            if (i < 4) {
+                highscores += "\n";
+            }
+        }
+
+
+        Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
+        cover.setFill(Paint.valueOf("#FFFFFF"));
+        pane.getChildren().add(cover);
+
+        Text table = new Text(highscores);
+        table.setFont(new Font(26));
+        int padX = (Froqr.GAME_SIZE_X - 150)/2;
+        int padY = (Froqr.GAME_SIZE_Y - 150)/2;
+        VBox vb = new VBox();
+        vb.setAlignment(Pos.CENTER);
+        vb.setPadding(new Insets(padY, padX, padY, padX));
+        vb.getChildren().add(table);
+        pane.getChildren().add(vb);
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("highscores.txt"), "UTF-8"));
+            for (String key : scores.keySet()) {
+                writer.write(key + "," + String.valueOf(scores.get(key) + "\n"));
+            }
+            writer.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            //TODO: again, don't do this
+        }
     }
 }
