@@ -1,7 +1,7 @@
 Tersa,0
-,0
+TERASONPARIM,66
 wwNimi,0
-Test,54
+Test,1
 asdNimi,0
 das,0
 Andreas,0

@@ -42,7 +42,7 @@ public class Frog extends Drawable {
         return chunkPosition;
     }
 
-    public long getOffsetY() {
+    public long getYOffset() {
         return offsetY;
     }
 

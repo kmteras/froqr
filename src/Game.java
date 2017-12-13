@@ -20,9 +20,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
-import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -286,6 +287,10 @@ public class Game implements EventHandler<Event> {
                 frog.getConnectedObject().setPlayer(null);
             }
 
+            if(frog.getChunkPosition() * Tile.TILE_SIZE_X + frog.getYOffset() / 1_000_000_000L > (long)Froqr.GAME_SIZE_Y) {
+                throw new CollisionException("Ekraan sõi su ära");
+            }
+
         }
         catch (CollisionException e) {
             System.out.println(e.toString());
@@ -305,7 +310,7 @@ public class Game implements EventHandler<Event> {
             addDebugText(i + ": " + chunk.getOffset() / 1_000_000_000);
         }
 
-        addDebugText(frog.getTilePosition() + " " + frog.getChunkPosition() + " " + frog.getOffsetY() / 1_000_000_000 + " " + frog.getChunkOffset() / 1_000_000_000);
+        addDebugText(frog.getTilePosition() + " " + frog.getChunkPosition() + " " + frog.getYOffset() / 1_000_000_000 + " " + frog.getChunkOffset() / 1_000_000_000);
 
         for(Chunk chunk : chunks) {
             if(chunk.getOffset() == frog.getChunkOffset()) {
@@ -359,22 +364,23 @@ public class Game implements EventHandler<Event> {
     private void displayHighScores() {
         HashMap<String, Integer> scores = HighScores.load();
 
-        HashMap<String, Integer> loopscores = (HashMap<String, Integer>) scores.clone();
+        ArrayList<Pair<String, Integer>> scoresList = new ArrayList<>();
+
+        for(String key : scores.keySet()) {
+            scoresList.add(new Pair<>(key, scores.get(key)));
+        }
+
+        scoresList.sort(new Comparator<Pair<String, Integer>>() {
+            @Override
+            public int compare(Pair<String, Integer> stringIntegerPair, Pair<String, Integer> t1) {
+                return t1.getValue() - stringIntegerPair.getValue() ;
+            }
+        });
 
         highScoresTextArea.setText("");
 
-        for (int i = 0; i < 5; i++) {
-            int maxscore = -1;
-            String best = "Free place";
-
-            for (String key : ((HashMap<String, Integer>) loopscores.clone()).keySet()) {
-                //changing the map that is being iterated automatically gives ConcurrentModificationException
-                if (loopscores.get(key) > maxscore) {
-                    maxscore = loopscores.remove(key);
-                    best = key;
-                }
-            }
-            highScoresTextArea.appendText(best + ": " + String.valueOf(maxscore) + "\n");
+        for(Pair<String, Integer> score : scoresList) {
+            highScoresTextArea.appendText(score.getKey() + ": " + score.getValue() + "\n");
         }
     }
 }
