@@ -42,5 +42,6 @@ public class HighScores {
         }
 
         scores.put(name, score);
+        save();
     }
 }

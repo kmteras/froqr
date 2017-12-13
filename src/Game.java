@@ -40,6 +40,7 @@ public class Game implements EventHandler<Event> {
     private Frog frog;
     private GraphicsContext gc;
     private Pane gameOverPane;
+    private Text gameOverScore;
     private TextArea highScoresTextArea;
     private ArrayList<Chunk> chunks;
     private Label debugText;
@@ -114,10 +115,9 @@ public class Game implements EventHandler<Event> {
 
         Text gameover = new Text("Mäng läbi!");
         gameover.setFont(new Font(26));
-        //TODO: Teras, get score here pls
-        Text score = new Text(String.valueOf(0) + " punkti");
-        score.setFont(new Font(18));
-        score.setFill(Color.RED);
+        gameOverScore = new Text(calculateScore() + " punkti");
+        gameOverScore.setFont(new Font(18));
+        gameOverScore.setFill(Color.RED);
         TextField textField = new TextField();
         textField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);");
         textField.setPromptText("Nimi");
@@ -132,14 +132,13 @@ public class Game implements EventHandler<Event> {
             }
         });
 
-
         button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if(!saveScore(textField.getText())) {
                 button.setText("Sisesta nimi!");
             }
         });
 
-        vbox.getChildren().addAll(gameover, score, textField, button);
+        vbox.getChildren().addAll(gameover, gameOverScore, textField, button);
 
         gameOverPane = new Pane();
         gameOverPane.getChildren().addAll(cover, vbox);
@@ -179,6 +178,7 @@ public class Game implements EventHandler<Event> {
     }
 
     private void showGameOverScreen() {
+        gameOverScore.setText(calculateScore() + " punkti");
         gameOverPane.setVisible(true);
     }
 
@@ -329,14 +329,24 @@ public class Game implements EventHandler<Event> {
 
         frog.draw(gc);
 
+        gc.setFill(Color.BEIGE.darker());
+        gc.fillRect(0, 0, Froqr.GAME_SIZE_X, Tile.TILE_SIZE_Y);
+
+        gc.setFill(Color.BLACK);
+        gc.fillText("Score: " + calculateScore(), 10, 20);
+
         if(drawDebug) {
             drawDebug(dt);
         }
     }
 
+    private int calculateScore() {
+        return (int) ((lastTime - startTime) / 1_000_000_000);
+    }
+
     private boolean saveScore(String name) {
         try {
-            HighScores.addScore(name, (int) ((lastTime - startTime) / 1_000_000_000));
+            HighScores.addScore(name, calculateScore());
             gameOverPane.setVisible(false);
             displayHighScores();
         }
