@@ -1,17 +1,31 @@
 import javafx.animation.AnimationTimer;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Game implements EventHandler<Event> {
     private static long SCROLL_SPEED = 20;
@@ -27,6 +41,7 @@ public class Game implements EventHandler<Event> {
     private ChunkGenerator chunkGenerator;
     private Frog frog;
     private GraphicsContext gc;
+    private Pane pane;
     private ArrayList<Chunk> chunks;
     private Label debugText;
     private long startTime;
@@ -43,7 +58,8 @@ public class Game implements EventHandler<Event> {
                 gameLoopIncrement(l);
             }
         };
-        Pane pane = new Pane();
+        pane = new Pane();
+        pane.setPrefSize(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
         Canvas canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
 
         debugText = new Label("");
@@ -72,9 +88,33 @@ public class Game implements EventHandler<Event> {
     }
 
     public void gameLoopIncrement(long dt) {
-        if(gameState == GameState.RUNNING || gameState == GameState.GAME_OVER) {
+        if(gameState == GameState.RUNNING) {
             update(dt);
             draw(dt);
+        }
+        else if (gameState == GameState.GAME_OVER) {
+
+            Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
+            cover.setFill(Paint.valueOf("#FFFFFF"));
+
+            VBox vbox = new VBox();
+            vbox.setAlignment(Pos.CENTER_LEFT);
+            vbox.setSpacing(30);
+            int padX = (Froqr.GAME_SIZE_X - 200)/2;
+            int padY = (Froqr.GAME_SIZE_Y - 200)/2;
+            vbox.setPadding(new Insets(padY, padX, padY, padX));
+
+            Text gameover = new Text("Mäng läbi!");
+            gameover.setFont(new Font(26));
+            TextField textField = new TextField("Nimi");
+
+            Button button = new Button("Salvesta skoor");
+            button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> saveAndDisplayHighScores(textField.getText(), vbox));
+
+            pane.getChildren().add(cover);
+            vbox.getChildren().addAll(gameover, textField, button);
+            pane.getChildren().add(vbox);
+            animationTimer.stop();
         }
         else {
             animationTimer.stop();
@@ -116,9 +156,9 @@ public class Game implements EventHandler<Event> {
             }
             long itc = dt - lastTime;
 
-            if(gameState == GameState.GAME_OVER) {
+            /*if(gameState == GameState.GAME_OVER) {
                 //Start gameover state
-            }
+            }*/
 
             int lastIndex = 0;
             boolean generateNew = false;
@@ -156,9 +196,7 @@ public class Game implements EventHandler<Event> {
                 Tile tile = chunk.getTile(frog.getTilePosition());
                 int type = tile.getType();
 
-                if(type == TileType.WATER) {
-                    gameState = GameState.GAME_OVER;
-                }
+                boolean onLog = false;
 
                 for(MovableObject movableObject : chunk.getMovableObjects()) {
                     //System.out.println(movableObject.getLeftX() + " " + movableObject.getRightX() + " " + frog.getXPosition());
@@ -168,15 +206,21 @@ public class Game implements EventHandler<Event> {
                         if(movableObjectType == MovableObjectType.CAR ||
                                 movableObjectType == MovableObjectType.BUS) {
                             //Collision with moving object - endgame
-                            System.out.println("Collision");
+                            gameState = GameState.GAME_OVER;
+                            System.out.println("Collision with vehicle");
                         }
                         else if(movableObjectType == MovableObjectType.LOG) {
+                            onLog = true;
                             collidedWithMovableObject = true;
                             movableObject.setPlayer(frog);
-                            System.out.println("Collision");
+                            System.out.println("Collision with log");
                         }
                         System.out.println(movableObjectType);
                     }
+                }
+
+                if (type == TileType.WATER && !onLog) {
+                    gameState = GameState.GAME_OVER;
                 }
             }
         }
@@ -225,5 +269,26 @@ public class Game implements EventHandler<Event> {
         if(drawDebug) {
             drawDebug(dt);
         }
+    }
+
+    private void saveAndDisplayHighScores(String name, VBox target) {
+        HashMap<String, Integer> scores = new HashMap<>();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.txt")));
+
+            while (reader.ready()) {
+                String[] row = reader.readLine().trim().split(",");
+                scores.put(row[0], Integer.parseInt(row[1]));
+            }
+            scores.put(name, 0);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            //TODO: dont do this
+        }
+
+        //TODO: somehow get score
+        //TODO: sort and find top 5 scores
+        //TODO: display top scores
     }
 }

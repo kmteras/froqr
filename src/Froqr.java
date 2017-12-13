@@ -29,7 +29,6 @@ public class Froqr extends Application {
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(30);
-        vbox.setPadding(new Insets(0,0,0,20));
 
         Text title = new Text("Froqr");
         title.setFont(new Font(45));
