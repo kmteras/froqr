@@ -20,13 +20,13 @@ public class ChunkGenerator {
                 //VERY inefficient way to get grass chunks to start on
                 Chunk chunk;
                 do {
-                    chunk = new Chunk((long)(i * Tile.TILE_SIZE) * 1_000_000_000, random.nextInt());
+                    chunk = new Chunk((long)(i * Tile.TILE_SIZE_X) * 1_000_000_000, random.nextInt());
                 } while(chunk.getType() != ChunkType.GRASS);
 
                 chunks.add(0, chunk);
             }
             else {
-                chunks.add(0, new Chunk((long) (i * Tile.TILE_SIZE) * 1_000_000_000, random.nextInt()));
+                chunks.add(0, new Chunk((long) (i * Tile.TILE_SIZE_X) * 1_000_000_000, random.nextInt()));
             }
         }
         return chunks;

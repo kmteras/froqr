@@ -78,7 +78,7 @@ public class Chunk extends Drawable {
 
         for(int i = 0; i < tiles.length; i++) {
             int tileType = selectableTiles[random.nextInt(selectableTiles.length)];
-            tiles[i] = new Tile(tileType, i * Tile.TILE_SIZE, offset);
+            tiles[i] = new Tile(tileType, i * Tile.TILE_SIZE_X, offset);
         }
     }
 

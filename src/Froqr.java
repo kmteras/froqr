@@ -23,7 +23,7 @@ public class Froqr extends Application {
         Game game = new Game(root);
 
         stage.setTitle("Froqr");
-        Scene scene = new Scene(root, GAME_SIZE_X, GAME_SIZE_Y);
+        Scene scene = new Scene(root, GAME_SIZE_X + 200, GAME_SIZE_Y);
         scene.addEventFilter(KeyEvent.ANY, game);
 
         VBox vbox = new VBox();
@@ -42,7 +42,7 @@ public class Froqr extends Application {
             @Override
             public void handle(MouseEvent event) {
                 vbox.setVisible(false);
-                game.start();
+                game.start(0);
             }
         });
 

@@ -1,4 +1,8 @@
+Tersa,0
+,0
 wwNimi,0
+Test,0
 asdNimi,0
+das,0
 Andreas,0
 Teras,0

@@ -3,11 +3,11 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -24,13 +24,13 @@ import javafx.scene.text.Text;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Game implements EventHandler<Event> {
-    private static long SCROLL_SPEED = 20;
+    private long SCROLL_SPEED = 20;
 
     public enum GameState {
         RUNNING,
-        STOPPED,
         STARTING,
         GAME_OVER
     }
@@ -39,7 +39,8 @@ public class Game implements EventHandler<Event> {
     private ChunkGenerator chunkGenerator;
     private Frog frog;
     private GraphicsContext gc;
-    private Pane pane;
+    private Pane gameOverPane;
+    private TextArea highScoresTextArea;
     private ArrayList<Chunk> chunks;
     private Label debugText;
     private long startTime;
@@ -56,33 +57,111 @@ public class Game implements EventHandler<Event> {
                 gameLoopIncrement(l);
             }
         };
-        pane = new Pane();
-        pane.setPrefSize(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
+        Pane gamePane = new Pane();
+        gamePane.setPrefSize(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
         Canvas canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
 
         debugText = new Label("");
         debugText.setTextFill(Color.RED);
-        startTime = 0;
         drawDebug = false;
 
-        pane.getChildren().add(canvas);
-        pane.getChildren().add(debugText);
+        gamePane.getChildren().add(canvas);
+        gamePane.getChildren().add(debugText);
+        GridPane.setColumnIndex(gamePane, 0);
 
-        root.getChildren().add(pane);
+        root.getChildren().add(gamePane);
 
         gc = canvas.getGraphicsContext2D();
 
-        frog = new Frog(13, 6);
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, this);
         canvas.addEventHandler(MouseEvent.ANY, this);
 
-        chunkGenerator = new ChunkGenerator(0);
-        chunks = chunkGenerator.getStartingChunks();
+        setupHighScorePane(root);
+        setupGameOverScreen(root);
+
+        displayHighScores();
     }
 
-    public void start() {
+    public void start(int seed) {
         gameState = GameState.RUNNING;
+
+        frog = new Frog(13, 6);
+        startTime = 0;
+
+        chunkGenerator = new ChunkGenerator(seed);
+        chunks = chunkGenerator.getStartingChunks();
         animationTimer.start();
+    }
+
+    private void reset() {
+        if(gameState != GameState.GAME_OVER) {
+            animationTimer.stop();
+            Random random = new Random();
+            start(random.nextInt());
+        }
+    }
+
+    private void setupGameOverScreen(GridPane pane) {
+        Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
+        cover.setFill(Paint.valueOf("#FFFFFF"));
+
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER_LEFT);
+        vbox.setSpacing(30);
+        int padX = (Froqr.GAME_SIZE_X - 200)/2;
+        int padY = (Froqr.GAME_SIZE_Y - 200)/2;
+        vbox.setPadding(new Insets(padY, padX, padY, padX));
+
+        Text gameover = new Text("Mäng läbi!");
+        gameover.setFont(new Font(26));
+        //TODO: Teras, get score here pls
+        Text score = new Text(String.valueOf(0) + " punkti");
+        score.setFont(new Font(18));
+        score.setFill(Color.RED);
+        TextField textField = new TextField();
+        textField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);");
+        textField.setPromptText("Nimi");
+
+        Button button = new Button("Salvesta skoor");
+
+        textField.setOnKeyPressed(event -> {
+            if(event.getCode() == KeyCode.ENTER) {
+                if(!saveScore(textField.getText())) {
+                    button.setText("Sisesta nimi!");
+                }
+            }
+        });
+
+
+        button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if(!saveScore(textField.getText())) {
+                button.setText("Sisesta nimi!");
+            }
+        });
+
+        vbox.getChildren().addAll(gameover, score, textField, button);
+
+        gameOverPane = new Pane();
+        gameOverPane.getChildren().addAll(cover, vbox);
+
+        pane.getChildren().add(gameOverPane);
+        gameOverPane.setVisible(false);
+    }
+
+    private void setupHighScorePane(GridPane root) {
+        highScoresTextArea = new TextArea();
+        highScoresTextArea.appendText("test");
+        highScoresTextArea.setMinSize(200, Froqr.GAME_SIZE_Y);
+        highScoresTextArea.setPrefColumnCount(0);
+        highScoresTextArea.setEditable(false);
+        highScoresTextArea.setFocusTraversable(false);
+
+        Pane highScorePane = new Pane();
+        highScorePane.getChildren().addAll(highScoresTextArea);
+
+        GridPane.setColumnIndex(highScorePane, 1);
+
+        root.getChildren().add(highScorePane);
     }
 
     public void gameLoopIncrement(long dt) {
@@ -91,38 +170,16 @@ public class Game implements EventHandler<Event> {
             draw(dt);
         }
         else if (gameState == GameState.GAME_OVER) {
-
             animationTimer.stop();
-
-            Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
-            cover.setFill(Paint.valueOf("#FFFFFF"));
-
-            VBox vbox = new VBox();
-            vbox.setAlignment(Pos.CENTER_LEFT);
-            vbox.setSpacing(30);
-            int padX = (Froqr.GAME_SIZE_X - 200)/2;
-            int padY = (Froqr.GAME_SIZE_Y - 200)/2;
-            vbox.setPadding(new Insets(padY, padX, padY, padX));
-
-            Text gameover = new Text("Mäng läbi!");
-            gameover.setFont(new Font(26));
-            //TODO: Teras, get score here pls
-            Text score = new Text(String.valueOf(0) + " punkti");
-            score.setFont(new Font(18));
-            score.setFill(Color.RED);
-            TextField textField = new TextField("Nimi");
-
-            Button button = new Button("Salvesta skoor");
-            button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> saveAndDisplayHighScores(textField.getText()));
-
-            pane.getChildren().add(cover);
-            vbox.getChildren().addAll(gameover, score, textField, button);
-            pane.getChildren().add(vbox);
-            animationTimer.stop();
+            showGameOverScreen();
         }
         else {
             animationTimer.stop();
         }
+    }
+
+    private void showGameOverScreen() {
+        gameOverPane.setVisible(true);
     }
 
     @Override
@@ -140,6 +197,9 @@ public class Game implements EventHandler<Event> {
             }
             else if(keyEvent.getCode() == KeyCode.S) {
                 frog.moveTile(0,  1);
+            }
+            else if(keyEvent.getCode() == KeyCode.R) {
+                reset();
             }
             else if(keyEvent.getCode() == KeyCode.Q) {
                 debugText.setText("");
@@ -159,10 +219,6 @@ public class Game implements EventHandler<Event> {
                 return;
             }
             long itc = dt - lastTime;
-
-            /*if(gameState == GameState.GAME_OVER) {
-                //Start gameover state
-            }*/
 
             int lastIndex = 0;
             boolean generateNew = false;
@@ -205,23 +261,18 @@ public class Game implements EventHandler<Event> {
                     boolean onLog = false;
 
                     for(MovableObject movableObject : chunk.getMovableObjects()) {
-                        //System.out.println(movableObject.getLeftX() + " " + movableObject.getRightX() + " " + frog.getXPosition());
                         if(frog.getXPosition() > movableObject.getLeftX() &&
                                 frog.getXPosition() < movableObject.getRightX()) {
                             int movableObjectType = movableObject.getType();
                             if(movableObjectType == MovableObjectType.CAR ||
                                     movableObjectType == MovableObjectType.BUS) {
-                                //Collision with moving object - endgame
-                                System.out.println("Collision with vehicle");
                                 throw new CollisionException("Sa jäid auto alla!");
                             }
                             else if(movableObjectType == MovableObjectType.LOG) {
                                 onLog = true;
                                 collidedWithMovableObject = true;
                                 movableObject.setPlayer(frog);
-                                System.out.println("Collision with log");
                             }
-                            System.out.println(movableObjectType);
                         }
                     }
 
@@ -237,6 +288,7 @@ public class Game implements EventHandler<Event> {
 
         }
         catch (CollisionException e) {
+            System.out.println(e.toString());
             gameState = GameState.GAME_OVER;
         }
     }
@@ -282,28 +334,24 @@ public class Game implements EventHandler<Event> {
         }
     }
 
-    private void saveAndDisplayHighScores(String name) {
-
-        HashMap<String, Integer> scores = new HashMap<>();
+    private boolean saveScore(String name) {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.txt")));
-
-            while (reader.ready()) {
-                String[] row = reader.readLine().trim().split(",");
-                scores.put(row[0], Integer.parseInt(row[1]));
-            }
-            reader.close();
-            //TODO: Teras, somehow get score here
-            scores.put(name, 0);
+            HighScores.addScore(name, (int) ((lastTime - startTime) / 1_000_000_000));
+            gameOverPane.setVisible(false);
+            displayHighScores();
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            //TODO: dont do this
+        catch (IllegalArgumentException e) {
+            return false;
         }
+        return true;
+    }
 
-        String highscores = "";
+    private void displayHighScores() {
+        HashMap<String, Integer> scores = HighScores.load();
+
         HashMap<String, Integer> loopscores = (HashMap<String, Integer>) scores.clone();
 
+        highScoresTextArea.setText("");
 
         for (int i = 0; i < 5; i++) {
             int maxscore = -1;
@@ -316,37 +364,7 @@ public class Game implements EventHandler<Event> {
                     best = key;
                 }
             }
-            highscores += best + ": " + String.valueOf(maxscore);
-            if (i < 4) {
-                highscores += "\n";
-            }
-        }
-
-
-        Rectangle cover = new Rectangle(0, 0, Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
-        cover.setFill(Paint.valueOf("#FFFFFF"));
-        pane.getChildren().add(cover);
-
-        Text table = new Text(highscores);
-        table.setFont(new Font(26));
-        int padX = (Froqr.GAME_SIZE_X - 150)/2;
-        int padY = (Froqr.GAME_SIZE_Y - 150)/2;
-        VBox vb = new VBox();
-        vb.setAlignment(Pos.CENTER);
-        vb.setPadding(new Insets(padY, padX, padY, padX));
-        vb.getChildren().add(table);
-        pane.getChildren().add(vb);
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("highscores.txt"), "UTF-8"));
-            for (String key : scores.keySet()) {
-                writer.write(key + "," + String.valueOf(scores.get(key) + "\n"));
-            }
-            writer.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            //TODO: again, don't do this
+            highScoresTextArea.appendText(best + ": " + String.valueOf(maxscore) + "\n");
         }
     }
 }

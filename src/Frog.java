@@ -8,20 +8,20 @@ public class Frog extends Drawable {
     private MovableObject connectedObject;
 
     public Frog(int chunk, int tile) {
-        xPos = tile * (long)Tile.TILE_SIZE * 1_000_000_000L;
+        xPos = tile * (long)Tile.TILE_SIZE_X * 1_000_000_000L;
         chunkPosition = chunk;
         connectedObject = null;
     }
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
-        gc.fillRect(xPos / 1_000_000_000, chunkPosition * Tile.TILE_SIZE + offsetY / 1_000_000_000, Tile.TILE_SIZE, Tile.TILE_SIZE);
+        gc.fillRect(xPos / 1_000_000_000, chunkPosition * Tile.TILE_SIZE_X + offsetY / 1_000_000_000, Tile.TILE_SIZE_X, Tile.TILE_SIZE_X);
     }
 
     public void moveTile(long x, long y) {
-        if(xPos + x * (long)Tile.TILE_SIZE * 1_000_000_000L >= 0 &&
-                xPos + x * (long)Tile.TILE_SIZE * 1_000_000_000L < (long)Chunk.CHUNK_TILE_AMT * (long)Tile.TILE_SIZE * 1_000_000_000L) {
-            xPos += x * (long)Tile.TILE_SIZE * 1_000_000_000L;
+        if(xPos + x * (long)Tile.TILE_SIZE_X * 1_000_000_000L >= 0 &&
+                xPos + x * (long)Tile.TILE_SIZE_X * 1_000_000_000L < (long)Chunk.CHUNK_TILE_AMT * (long)Tile.TILE_SIZE_X * 1_000_000_000L) {
+            xPos += x * (long)Tile.TILE_SIZE_X * 1_000_000_000L;
         }
         chunkPosition += y;
     }
@@ -35,7 +35,7 @@ public class Frog extends Drawable {
     }
 
     public int getTilePosition() {
-        return (int)(xPos / Tile.TILE_SIZE / 1_000_000_000);
+        return (int)(xPos / Tile.TILE_SIZE_X / 1_000_000_000);
     }
 
     public int getChunkPosition() {
@@ -51,7 +51,7 @@ public class Frog extends Drawable {
     }
 
     public long getXPosition() {
-        return xPos;
+        return xPos + (long)Tile.TILE_SIZE_X/2 * 1_000_000L;
     }
 
     public MovableObject getConnectedObject() {
