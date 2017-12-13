@@ -193,44 +193,51 @@ public class Game implements EventHandler<Event> {
     }
 
     private void checkCollision() {
+
         boolean collidedWithMovableObject = false;
 
-        for(Chunk chunk : chunks) {
-            if(chunk.getOffset() == frog.getChunkOffset()) {
-                Tile tile = chunk.getTile(frog.getTilePosition());
-                int type = tile.getType();
+        try {
+            for(Chunk chunk : chunks) {
+                if(chunk.getOffset() == frog.getChunkOffset()) {
+                    Tile tile = chunk.getTile(frog.getTilePosition());
+                    int type = tile.getType();
 
-                boolean onLog = false;
+                    boolean onLog = false;
 
-                for(MovableObject movableObject : chunk.getMovableObjects()) {
-                    //System.out.println(movableObject.getLeftX() + " " + movableObject.getRightX() + " " + frog.getXPosition());
-                    if(frog.getXPosition() > movableObject.getLeftX() &&
-                            frog.getXPosition() < movableObject.getRightX()) {
-                        int movableObjectType = movableObject.getType();
-                        if(movableObjectType == MovableObjectType.CAR ||
-                                movableObjectType == MovableObjectType.BUS) {
-                            //Collision with moving object - endgame
-                            gameState = GameState.GAME_OVER;
-                            System.out.println("Collision with vehicle");
+                    for(MovableObject movableObject : chunk.getMovableObjects()) {
+                        //System.out.println(movableObject.getLeftX() + " " + movableObject.getRightX() + " " + frog.getXPosition());
+                        if(frog.getXPosition() > movableObject.getLeftX() &&
+                                frog.getXPosition() < movableObject.getRightX()) {
+                            int movableObjectType = movableObject.getType();
+                            if(movableObjectType == MovableObjectType.CAR ||
+                                    movableObjectType == MovableObjectType.BUS) {
+                                //Collision with moving object - endgame
+                                System.out.println("Collision with vehicle");
+                                throw new CollisionException("Sa jäid auto alla!");
+                            }
+                            else if(movableObjectType == MovableObjectType.LOG) {
+                                onLog = true;
+                                collidedWithMovableObject = true;
+                                movableObject.setPlayer(frog);
+                                System.out.println("Collision with log");
+                            }
+                            System.out.println(movableObjectType);
                         }
-                        else if(movableObjectType == MovableObjectType.LOG) {
-                            onLog = true;
-                            collidedWithMovableObject = true;
-                            movableObject.setPlayer(frog);
-                            System.out.println("Collision with log");
-                        }
-                        System.out.println(movableObjectType);
+                    }
+
+                    if (type == TileType.WATER && !onLog) {
+                        throw new CollisionException("Sa uppusid!");
                     }
                 }
-
-                if (type == TileType.WATER && !onLog) {
-                    gameState = GameState.GAME_OVER;
-                }
             }
-        }
 
-        if(!collidedWithMovableObject && frog.getConnectedObject() != null) {
-            frog.getConnectedObject().setPlayer(null);
+            if(!collidedWithMovableObject && frog.getConnectedObject() != null) {
+                frog.getConnectedObject().setPlayer(null);
+            }
+
+        }
+        catch (CollisionException e) {
+            gameState = GameState.GAME_OVER;
         }
     }
 
