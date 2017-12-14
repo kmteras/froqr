@@ -4,5 +4,5 @@ wwNimi,0
 Test,1
 asdNimi,0
 das,0
-Andreas,0
+Andreas,17
 Teras,10
