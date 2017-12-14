@@ -74,7 +74,6 @@ public class Game implements EventHandler<Event> {
         root.getChildren().add(gamePane);
 
         gc = canvas.getGraphicsContext2D();
-
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, this);
         canvas.addEventHandler(MouseEvent.ANY, this);
 
@@ -250,7 +249,6 @@ public class Game implements EventHandler<Event> {
     }
 
     private void checkCollision() {
-
         boolean collidedWithMovableObject = false;
 
         try {
@@ -342,6 +340,13 @@ public class Game implements EventHandler<Event> {
 
         if(drawDebug) {
             drawDebug(dt);
+        }
+    }
+
+    public void changeScale(double x, double y) {
+        if(gameState != GameState.STARTING) {
+            System.out.println("" + x + " " + y);
+            gc.scale(x, y);
         }
     }
 

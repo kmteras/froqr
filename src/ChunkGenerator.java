@@ -15,7 +15,7 @@ public class ChunkGenerator {
     public ArrayList<Chunk> getStartingChunks() {
         ArrayList<Chunk> chunks = new ArrayList<>();
 
-        for(int i = 0; i < 16; i++) {
+        for(int i = 0; i < Chunk.CHUNK_AMT; i++) {
             if(i > 10) {
                 //VERY inefficient way to get grass chunks to start on
                 Chunk chunk;

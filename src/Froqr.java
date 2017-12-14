@@ -11,10 +11,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import sun.tools.jar.Main;
 
 public class Froqr extends Application {
-    public static int GAME_SIZE_X = 416 ;
-    public static int GAME_SIZE_Y = 512;
+    public static final int GAME_SIZE_X = 416;
+    public static final int GAME_SIZE_Y = 512;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -49,6 +50,19 @@ public class Froqr extends Application {
         vbox.getChildren().addAll(title, intro, button);
         root.getChildren().add(vbox);
         stage.setScene(scene);
+        stage.setMinWidth(GAME_SIZE_X + 200);
+        stage.setMinHeight(GAME_SIZE_Y);
+        stage.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Double change = newVal.doubleValue()/oldVal.doubleValue();
+            if(!change.isNaN())
+                game.changeScale(change, 1);
+        });
+
+        stage.heightProperty().addListener((obs, oldVal, newVal) -> {
+            Double change = newVal.doubleValue()/oldVal.doubleValue();
+            if(!change.isNaN())
+                game.changeScale(1, change);
+        });
         stage.show();
     }
 

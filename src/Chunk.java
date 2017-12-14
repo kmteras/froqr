@@ -3,7 +3,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Chunk extends Drawable {
-    public static int CHUNK_TILE_AMT = 13;
+    public static final int CHUNK_TILE_AMT = 13;
+    public static final int CHUNK_AMT = 16;
 
     private int type;
     private Tile[] tiles;
@@ -83,7 +84,7 @@ public class Chunk extends Drawable {
     }
 
     public boolean isOutOfScreen() {
-        return offset >= (long)Froqr.GAME_SIZE_Y * 1_000_000_000L;
+        return offset >= (long)CHUNK_AMT * (long)Tile.TILE_SIZE_Y * 1_000_000_000L;
     }
 
     public long getOffset() {
