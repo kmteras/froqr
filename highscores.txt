@@ -1,8 +1,11 @@
 Tersa,0
 TERASONPARIM,66
+T,1
 wwNimi,0
-Test,1
+Test,4
 asdNimi,0
 das,0
 Andreas,0
-Teras,10
+Teras,103
+DA,0
+Naide,20

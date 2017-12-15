@@ -12,9 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -40,8 +38,10 @@ public class Game implements EventHandler<Event> {
     private ChunkGenerator chunkGenerator;
     private Frog frog;
     private GraphicsContext gc;
+    private Canvas canvas;
     private Pane gameOverPane;
     private Text gameOverScore;
+    private Pane gamePane;
     private TextArea highScoresTextArea;
     private ArrayList<Chunk> chunks;
     private Label debugText;
@@ -59,9 +59,9 @@ public class Game implements EventHandler<Event> {
                 gameLoopIncrement(l);
             }
         };
-        Pane gamePane = new Pane();
+        gamePane = new Pane();
         gamePane.setPrefSize(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
-        Canvas canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
+        canvas = new Canvas(Froqr.GAME_SIZE_X, Froqr.GAME_SIZE_Y);
 
         debugText = new Label("");
         debugText.setTextFill(Color.RED);
@@ -70,6 +70,13 @@ public class Game implements EventHandler<Event> {
         gamePane.getChildren().add(canvas);
         gamePane.getChildren().add(debugText);
         GridPane.setColumnIndex(gamePane, 0);
+
+        ColumnConstraints cc = new ColumnConstraints();
+        cc.setHgrow(Priority.SOMETIMES);
+        RowConstraints rc = new RowConstraints();
+        rc.setVgrow(Priority.SOMETIMES);
+        root.getColumnConstraints().add(cc);
+        root.getRowConstraints().add(rc);
 
         root.getChildren().add(gamePane);
 
@@ -100,6 +107,10 @@ public class Game implements EventHandler<Event> {
             Random random = new Random();
             start(random.nextInt());
         }
+        else {
+            Random random = new Random();
+            start(random.nextInt());
+        }
     }
 
     private void setupGameOverScreen(GridPane pane) {
@@ -107,11 +118,8 @@ public class Game implements EventHandler<Event> {
         cover.setFill(Paint.valueOf("#FFFFFF"));
 
         VBox vbox = new VBox();
-        vbox.setAlignment(Pos.CENTER_LEFT);
         vbox.setSpacing(30);
-        int padX = (Froqr.GAME_SIZE_X - 200)/2;
-        int padY = (Froqr.GAME_SIZE_Y - 200)/2;
-        vbox.setPadding(new Insets(padY, padX, padY, padX));
+        vbox.setAlignment(Pos.CENTER);
 
         Text gameover = new Text("Mäng läbi!");
         gameover.setFont(new Font(26));
@@ -121,6 +129,7 @@ public class Game implements EventHandler<Event> {
         TextField textField = new TextField();
         textField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);");
         textField.setPromptText("Nimi");
+        textField.setMaxWidth(200);
 
         Button button = new Button("Salvesta skoor");
 
@@ -129,6 +138,7 @@ public class Game implements EventHandler<Event> {
                 if(!saveScore(textField.getText())) {
                     button.setText("Sisesta nimi!");
                 }
+                reset();
             }
         });
 
@@ -136,11 +146,16 @@ public class Game implements EventHandler<Event> {
             if(!saveScore(textField.getText())) {
                 button.setText("Sisesta nimi!");
             }
+            reset();
         });
 
         vbox.getChildren().addAll(gameover, gameOverScore, textField, button);
 
-        gameOverPane = new Pane();
+        StackPane.setAlignment(vbox, Pos.CENTER);
+
+        gameOverPane = new StackPane();
+        cover.widthProperty().bind(gameOverPane.widthProperty());
+        cover.heightProperty().bind(gameOverPane.heightProperty());
         gameOverPane.getChildren().addAll(cover, vbox);
 
         pane.getChildren().add(gameOverPane);
@@ -347,6 +362,9 @@ public class Game implements EventHandler<Event> {
         if(gameState != GameState.STARTING) {
             System.out.println("" + x + " " + y);
             gc.scale(x, y);
+            canvas.setWidth(canvas.getWidth() * x);
+            canvas.setHeight(canvas.getHeight() * y);
+            //gamePane.resize(gamePane.getLayoutX() * x, gamePane.getLayoutY() * y);
         }
     }
 

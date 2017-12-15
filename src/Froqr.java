@@ -50,8 +50,7 @@ public class Froqr extends Application {
         vbox.getChildren().addAll(title, intro, button);
         root.getChildren().add(vbox);
         stage.setScene(scene);
-        stage.setMinWidth(GAME_SIZE_X + 200);
-        stage.setMinHeight(GAME_SIZE_Y);
+
         stage.widthProperty().addListener((obs, oldVal, newVal) -> {
             Double change = newVal.doubleValue()/oldVal.doubleValue();
             if(!change.isNaN())
@@ -59,11 +58,16 @@ public class Froqr extends Application {
         });
 
         stage.heightProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.print(stage.getHeight());
             Double change = newVal.doubleValue()/oldVal.doubleValue();
             if(!change.isNaN())
                 game.changeScale(1, change);
         });
         stage.show();
+
+        stage.setMinWidth(GAME_SIZE_X + 200);
+
+        stage.setMinHeight(stage.getHeight());
     }
 
     public static void main(String[] args) {
