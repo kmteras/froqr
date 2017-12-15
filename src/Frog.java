@@ -35,7 +35,7 @@ public class Frog extends Drawable {
     }
 
     public int getTilePosition() {
-        return (int)(xPos / Tile.TILE_SIZE_X / 1_000_000_000);
+        return (int)((xPos + Tile.TILE_SIZE_X / 2 * 1_000_000_000L)/ Tile.TILE_SIZE_X / 1_000_000_000L);
     }
 
     public int getChunkPosition() {
