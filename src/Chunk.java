@@ -47,11 +47,12 @@ public class Chunk extends Drawable {
     }
 
     private void generateMovables() {
+        //random.nextInt(20) - 10 - makes start position variable
         if(type == ChunkType.ROAD) {
-            movableObjects.add(new MovableObject(offset, random.nextInt(3) + 2, random.nextInt(2)));
+            movableObjects.add(new MovableObject(offset, random.nextInt(3) + 2, random.nextInt(2), random.nextInt(20) - 10));
         }
         if(type == ChunkType.WATER_LOG) {
-            movableObjects.add(new MovableObject(offset, random.nextInt(1) + 1, MovableObjectType.LOG));
+            movableObjects.add(new MovableObject(offset, random.nextInt(1) + 1, MovableObjectType.LOG, random.nextInt(20) - 10));
         }
     }
 

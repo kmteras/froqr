@@ -6,11 +6,15 @@ public class MovableObject extends Drawable {
     private long speed;
     private long offset;
     private int type;
+    private boolean startOffScreen;
 
     private Frog player;
 
-    public MovableObject(long offset, long speed, int type) {
-        x = 0;
+    public MovableObject(long offset, long speed, int type, int x) {
+        this.x = x * 1_000_000_000L;
+        if(x < 0) {
+            startOffScreen = true;
+        }
         this.speed = speed;
         this.offset = offset;
         this.type = type;
@@ -37,6 +41,17 @@ public class MovableObject extends Drawable {
         this.x += o * speed;
         if(player != null) {
             player.offsetX(o * speed);
+        }
+
+        if(type == MovableObjectType.LOG) {
+            if(x / 1_000_000_000L + Tile.TILE_SIZE_X * 3 > Froqr.GAME_SIZE_X ||                //Goes out of screen on right
+                    x < 0) {    //Goes out of screen on left
+                if(!startOffScreen)
+                    speed *= -1;    //Start going other way
+            }
+            else {
+                startOffScreen = false;
+            }
         }
     }
 
