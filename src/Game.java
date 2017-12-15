@@ -275,8 +275,8 @@ public class Game implements EventHandler<Event> {
                     boolean onLog = false;
 
                     for(MovableObject movableObject : chunk.getMovableObjects()) {
-                        if(frog.getXPosition() > movableObject.getLeftX() &&
-                                frog.getXPosition() < movableObject.getRightX()) {
+                        if(frog.getRightPosition() > movableObject.getLeftX() &&
+                                frog.getLeftPosition() < movableObject.getRightX()) {
                             int movableObjectType = movableObject.getType();
                             if(movableObjectType == MovableObjectType.CAR ||
                                     movableObjectType == MovableObjectType.BUS) {

@@ -54,6 +54,14 @@ public class Frog extends Drawable {
         return xPos + (long)Tile.TILE_SIZE_X/2 * 1_000_000_000L;
     }
 
+    public long getLeftPosition() {
+        return xPos;
+    }
+
+    public long getRightPosition() {
+        return xPos + (long)Tile.TILE_SIZE_X * 1_000_000_000L;
+    }
+
     public MovableObject getConnectedObject() {
         return connectedObject;
     }
