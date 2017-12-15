@@ -5,7 +5,7 @@ wwNimi,0
 Test,4
 asdNimi,0
 das,0
-Andreas,0
 Teras,103
 DA,0
 Naide,20
+Andreas,17
